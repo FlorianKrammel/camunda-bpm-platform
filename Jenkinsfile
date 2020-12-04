@@ -108,7 +108,7 @@ pipeline {
                   string(name: 'PR_LABELS', value: labels)
           ], quietPeriod: 10, wait: false
 
-          if (withLabels('all-db','cockroachdb','authorizations')) {
+          if (cambpmWithLabels('all-db','cockroachdb','authorizations')) {
            build job: "cambpm-jenkins-pipelines-sidetrack/${env.BRANCH_NAME}", parameters: [
            string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
@@ -116,7 +116,7 @@ pipeline {
            ], quietPeriod: 10, wait: false
           }
 
-          if (withLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
+          if (cambpmWithLabels('default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb','daily')) {
            build job: "cambpm-jenkins-pipelines-daily/${env.BRANCH_NAME}", parameters: [
                string(name: 'copyArtifactSelector', value: '<TriggeredBuildSelector plugin="copyartifact@1.45.1">  <upstreamFilterStrategy>UseGlobalSetting</upstreamFilterStrategy>  <allowUpstreamDependencies>false</allowUpstreamDependencies></TriggeredBuildSelector>'),
                booleanParam(name: 'STANDALONE', value: false),
@@ -140,7 +140,7 @@ pipeline {
         stage('engine-UNIT-h2') {
           when {
             expression {
-              withLabels('h2', 'rolling-update', 'migration')
+              cambpmWithLabels('h2', 'rolling-update', 'migration')
             }
             beforeAgent true
           }
@@ -168,7 +168,7 @@ pipeline {
         stage('engine-UNIT-authorizations-h2') {
           when {
             expression {
-              withLabels('h2','authorizations')
+              cambpmWithLabels('h2','authorizations')
             }
             beforeAgent true
           }
@@ -196,7 +196,7 @@ pipeline {
         stage('engine-rest-UNIT-jersey-2') {
           when {
             expression {
-              withLabels('rest-api')
+              cambpmWithLabels('rest-api')
             }
             beforeAgent true
           }
@@ -221,7 +221,7 @@ pipeline {
         stage('engine-rest-UNIT-resteasy3') {
           when {
             expression {
-              withLabels('rest-api')
+              cambpmWithLabels('rest-api')
             }
             beforeAgent true
           }
@@ -246,7 +246,7 @@ pipeline {
         stage('webapp-UNIT-h2') {
           when {
             expression {
-              withLabels('default-build')
+              cambpmWithLabels('default-build')
             }
             beforeAgent true
           }
@@ -274,7 +274,7 @@ pipeline {
         stage('webapp-UNIT-authorizations-h2') {
           when {
             expression {
-              withLabels('default-build')
+              cambpmWithLabels('default-build')
             }
           }
           agent {
@@ -301,7 +301,7 @@ pipeline {
         stage('engine-IT-tomcat-9-postgresql-96') {
           when {
             expression {
-              withLabels('all-as','tomcat')
+              cambpmWithLabels('all-as','tomcat')
             }
             beforeAgent true
           }
@@ -326,7 +326,7 @@ pipeline {
         stage('engine-IT-wildfly-postgresql-96') {
           when {
             expression {
-              withLabels('all-as','wildfly')
+              cambpmWithLabels('all-as','wildfly')
             }
           }
           agent {
@@ -353,7 +353,7 @@ pipeline {
         stage('webapp-IT-tomcat-9-h2') {
           when {
             expression {
-              withLabels('webapp-integration', 'h2')
+              cambpmWithLabels('webapp-integration', 'h2')
             }
             beforeAgent true
           }
@@ -401,7 +401,7 @@ pipeline {
         stage('camunda-run-IT') {
           when {
             expression {
-              withLabels('run')
+              cambpmWithLabels('run')
             }
             beforeAgent true
           }
@@ -426,7 +426,7 @@ pipeline {
         stage('spring-boot-starter-IT') {
           when {
             expression {
-              withLabels('spring-boot')
+              cambpmWithLabels('spring-boot')
             }
             beforeAgent true
           }
@@ -464,7 +464,7 @@ pipeline {
         }
         when {
           expression {
-            skipStageType(failedStageTypes, env.PROFILE) && (cambpmWithLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB))
+            skipStageType(failedStageTypes, env.PROFILE) && (cambpmWithLabelsArray(getLabels(env.PROFILE)) || withDbLabels(env.DB))
           }
           beforeAgent true
         }
@@ -553,7 +553,7 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              skipStageType(failedStageTypes, 'engine-unit') && withLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
+              skipStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
             }
             beforeAgent true
           }
@@ -636,7 +636,7 @@ pipeline {
         stage('IT-wildfly-domain') {
           when {
             expression {
-              skipStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
+              skipStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
             beforeAgent true
           }
@@ -661,7 +661,7 @@ pipeline {
         stage('IT-wildfly-servlet') {
           when {
             expression {
-              skipStageType(failedStageTypes, 'engine-IT-wildfly') && withLabels('wildfly')
+              skipStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
             beforeAgent true
           }
@@ -716,33 +716,9 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
-<<<<<<< HEAD
-boolean withLabels(List labels) { // TODO
-  if (env.BRANCH_NAME != cambpmDefaultBranch() && !pullRequest.labels.contains('no-build')) {
-    return false;
-  }
-
-  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
-    return !labels.contains('daily');
-  } else if (changeRequest()) {
-    for (l in labels) {
-      if (pullRequest.labels.contains(l)) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-=======
->>>>>>> 83bcea343f... chore(ci): extract withLabels
-boolean withLabels(String... labels) {
-  return cambpmWithLabels(Arrays.asList(labels));
-}
 
 boolean withDbLabels(String dbLabel) {
-  return withLabels(cambpmGetDbType(dbLabel),'all-db')
+  return cambpmWithLabels(getDbType(dbLabel),'all-db')
 }
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
