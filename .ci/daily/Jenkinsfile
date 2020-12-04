@@ -398,7 +398,6 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
-
 boolean withLabels(List labels) {
   if (params.STANDALONE && env.BRANCH_NAME != cambpmDefaultBranch() && pullRequest.labels.contains('no-build')) {
     return false;
@@ -472,59 +471,6 @@ spec:
         medium: ""
       name: "workspace-volume"
   """
-}
-
-String resolveMavenProfileInfo(String profile) {
-  Map PROFILE_PATHS = [
-      'check-sql': [
-          directory: 'distro/sql-script/',
-          command: 'install -Pcheck-sql,',
-          qaStash: false,
-          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
-     'upgrade-db': [
-          directory: 'qa/test-db-upgrade/',
-          command: 'verify -Pupgrade-db,',
-          qaStash: false,
-          labels: ['all-db','db2','mysql','oracle','mariadb','sqlserver','postgresql']],
-      'instance-migration': [
-          directory: 'qa/test-db-instance-migration/',
-          command: 'verify -Pinstance-migration,',
-          qaStash: true,
-          labels: []],
-      'old-engine': [
-          directory: 'qa/',
-          command: 'verify -Pold-engine,',
-          qaStash: false,
-          labels: []],
-      'rolling-update': [
-          directory: 'qa/test-db-rolling-update/',
-          command: 'verify -Prolling-update,',
-          qaStash: true,
-          labels: []],
-      'large-data-tests': [
-          directory: 'qa/large-data-tests/',
-          command: 'verify -Plarge-data-tests,',
-          qaStash: false,
-          labels: []]
-  ]
-
-  return PROFILE_PATHS[profile]
-}
-
-String getMavenProfileCmd(String profile) {
-  return resolveMavenProfileInfo(profile).command
-}
-
-String getMavenProfileDir(String profile) {
-  return resolveMavenProfileInfo(profile).directory
-}
-
-boolean isQaStashEnabled(String profile) {
-  return resolveMavenProfileInfo(profile).qaStash
-}
-
-String[] getLabels(String profile) {
-  return resolveMavenProfileInfo(profile).labels
 }
 
 void addFailedStageType(List failedStageTypesList, String stageType) {

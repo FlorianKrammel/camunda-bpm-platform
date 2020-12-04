@@ -790,41 +790,6 @@ spec:
   """
 }
 
-String resolveMavenProfileInfo(String profile) {
-  Map PROFILE_PATHS = [
-      'engine-unit': [
-          directory: 'engine/',
-          command: 'clean test -P',
-          labels: ['authorizations']],
-      'engine-unit-authorizations': [
-          directory: 'engine/',
-          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,',
-          labels: ['authorizations']],
-      'webapps-unit': [
-          directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -P',
-          labels: ['default-build']],
-      'webapps-unit-authorizations': [
-          directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
-          labels: ['default-build']]
-  ]
-
-  return PROFILE_PATHS[profile]
-}
-
-String getMavenProfileCmd(String profile) {
-  return resolveMavenProfileInfo(profile).command
-}
-
-String getMavenProfileDir(String profile) {
-  return resolveMavenProfileInfo(profile).directory
-}
-
-String[] getLabels(String profile) {
-  return resolveMavenProfileInfo(profile).labels
-}
-
 void addFailedStageType(List failedStageTypesList, String stageType) {
   if (!failedStageTypesList.contains(stageType)) failedStageTypesList << stageType
 }
