@@ -2,7 +2,7 @@ import groovy.json.JsonOutput
 
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@pipeline-extract-withlabels']) _
 
 String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
   String mavenForkCount = cpuLimit;
@@ -464,7 +464,7 @@ pipeline {
         }
         when {
           expression {
-            skipStageType(failedStageTypes, env.PROFILE) && (withLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB))
+            skipStageType(failedStageTypes, env.PROFILE) && (cambpmWithLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB))
           }
           beforeAgent true
         }
@@ -716,6 +716,7 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
+<<<<<<< HEAD
 boolean withLabels(List labels) { // TODO
   if (env.BRANCH_NAME != cambpmDefaultBranch() && !pullRequest.labels.contains('no-build')) {
     return false;
@@ -734,8 +735,10 @@ boolean withLabels(List labels) { // TODO
   return false;
 }
 
+=======
+>>>>>>> 83bcea343f... chore(ci): extract withLabels
 boolean withLabels(String... labels) {
-  return withLabels(Arrays.asList(labels));
+  return cambpmWithLabels(Arrays.asList(labels));
 }
 
 boolean withDbLabels(String dbLabel) {
