@@ -86,7 +86,7 @@ pipeline {
         }
         when {
           expression {
-            withLabels(getLabels(env.PROFILE))
+            withLabels(cambpmGetLabels(env.PROFILE))
           }
           beforeAgent true
         }
@@ -101,7 +101,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  runMaven(true, false, cambpmIsQaStashEnabled(env.PROFILE), cambpmGetMavenTargetDir(env.PROFILE), cambpmGetMavenTargetAndProfile(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }

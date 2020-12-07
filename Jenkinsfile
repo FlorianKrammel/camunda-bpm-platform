@@ -156,7 +156,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit'), getMavenProfileCmd('engine-unit') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('engine-unit'), cambpmGetMavenTargetAndProfile('engine-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -184,7 +184,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit-authorizations'), getMavenProfileCmd('engine-unit-authorizations') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('engine-unit-authorizations'), cambpmGetMavenTargetAndProfile('engine-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -262,7 +262,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit'), getMavenProfileCmd('webapps-unit') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('webapps-unit'), cambpmGetMavenTargetAndProfile('webapps-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -289,7 +289,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit-authorizations'), getMavenProfileCmd('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('webapps-unit-authorizations'), cambpmGetMavenTargetAndProfile('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -468,7 +468,7 @@ pipeline {
         }
         when {
           expression {
-            skipStageType(failedStageTypes, env.PROFILE) && (withLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB))
+            skipStageType(failedStageTypes, env.PROFILE) && (withLabels(cambpmGetLabels(env.PROFILE)) || withDbLabels(env.DB))
           }
           beforeAgent true
         }
@@ -483,7 +483,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  runMaven(true, false, false, cambpmGetMavenTargetDir(env.PROFILE), cambpmGetMavenTargetAndProfile(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
