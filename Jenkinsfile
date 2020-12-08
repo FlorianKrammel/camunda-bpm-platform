@@ -464,7 +464,7 @@ pipeline {
         }
         when {
           expression {
-            skipStageType(failedStageTypes, env.PROFILE) && (cambpmWithLabelsArray(getLabels(env.PROFILE)) || withDbLabels(env.DB))
+            skipStageType(failedStageTypes, env.PROFILE) && (cambpmWithLabelsArray(getLabels(env.PROFILE)) || cambpmWithDbLabels(env.DB))
           }
           beforeAgent true
         }
@@ -714,11 +714,6 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2  -f ${directory}/pom.xml -B")
   }
-}
-
-
-boolean withDbLabels(String dbLabel) {
-  return cambpmWithLabels(getDbType(dbLabel),'all-db')
 }
 
 String getDbAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){

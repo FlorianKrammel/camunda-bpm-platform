@@ -150,10 +150,6 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   }
 }
 
-boolean withDbLabels(String dbLabel) {
-  return cambpmWithLabels(getDbType(dbLabel));
-}
-
 String resolveMavenProfileInfo(String profile) {
   Map PROFILE_PATHS = [
       'engine-unit': [
